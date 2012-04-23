@@ -72,7 +72,7 @@ program
      ;
 
 program_element_list
-     : program_element_list program_element { debug_printSymbolTable();} 	
+     : program_element_list program_element //{ debug_printSymbolTable();} 	
      | program_element 				
      ;
 
@@ -99,17 +99,17 @@ identifier_declaration
      ;
 
 function_definition
-     : type ID PARA_OPEN PARA_CLOSE BRACE_OPEN {pushFunc($1,$2);} stmt_list BRACE_CLOSE {resetScope();}
-     | type ID PARA_OPEN function_parameter_list PARA_CLOSE BRACE_OPEN {resetScope(); $<Sym>$=pushFunc($1,$2); $<Sym>$->is.func.hasParams = 1; addParam($<Sym>$,$4->is.func.local_table);deleteFunc("-pseudo-");} stmt_list BRACE_CLOSE {resetScope();} 
+     : type ID PARA_OPEN PARA_CLOSE BRACE_OPEN {pushFunc($1,$2,NULL);} stmt_list BRACE_CLOSE {resetScope();}
+     | type ID PARA_OPEN function_parameter_list PARA_CLOSE BRACE_OPEN {resetScope(); $<Sym>$=pushFunc($1,$2,$4->is.func.local_table);} stmt_list BRACE_CLOSE {resetScope();} 
      ;
 
 function_declaration
-     : type ID PARA_OPEN PARA_CLOSE	{$$=pushFunc($1,$2);$$->is.func.isProto=1;resetScope();}					
-     | type ID PARA_OPEN function_parameter_list PARA_CLOSE {resetScope(); $$=pushFunc($1,$2);$$->is.func.hasParams = 1;addParam($$,$4->is.func.local_table);$$->is.func.isProto=1;deleteFunc("-pseudo-");resetScope();}		
+     : type ID PARA_OPEN PARA_CLOSE	{$$=pushFunc($1,$2,NULL);$$->is.func.isProto=1;resetScope();}					
+     | type ID PARA_OPEN function_parameter_list PARA_CLOSE {resetScope(); $$=pushFunc($1,$2,$4->is.func.local_table); $$->is.func.isProto=1;resetScope();}		
      ;
 
 function_parameter_list
-     : {$<Sym>$=pushFunc(0,"-pseudo-");}function_parameter
+     : {$<Sym>$=pushFunc(0,"-pseudo-",NULL);}function_parameter
      | function_parameter_list COMMA function_parameter	{$$=$1;}	
      ;
 	

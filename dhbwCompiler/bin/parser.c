@@ -1559,14 +1559,7 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 3:
-
-/* Line 1455 of yacc.c  */
-#line 75 "src/parser.y"
-    { debug_printSymbolTable();;}
-    break;
-
-  case 9:
+        case 9:
 
 /* Line 1455 of yacc.c  */
 #line 87 "src/parser.y"
@@ -1605,7 +1598,7 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 102 "src/parser.y"
-    {pushFunc((yyvsp[(1) - (5)].num),(yyvsp[(2) - (5)].id));;}
+    {pushFunc((yyvsp[(1) - (5)].num),(yyvsp[(2) - (5)].id),NULL);;}
     break;
 
   case 16:
@@ -1619,7 +1612,7 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 103 "src/parser.y"
-    {resetScope(); (yyval.Sym)=pushFunc((yyvsp[(1) - (6)].num),(yyvsp[(2) - (6)].id)); (yyval.Sym)->is.func.hasParams = 1; addParam((yyval.Sym),(yyvsp[(4) - (6)].Sym)->is.func.local_table);deleteFunc("-pseudo-");;}
+    {resetScope(); (yyval.Sym)=pushFunc((yyvsp[(1) - (6)].num),(yyvsp[(2) - (6)].id),(yyvsp[(4) - (6)].Sym)->is.func.local_table);;}
     break;
 
   case 18:
@@ -1633,21 +1626,21 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 107 "src/parser.y"
-    {(yyval.Sym)=pushFunc((yyvsp[(1) - (4)].num),(yyvsp[(2) - (4)].id));(yyval.Sym)->is.func.isProto=1;resetScope();;}
+    {(yyval.Sym)=pushFunc((yyvsp[(1) - (4)].num),(yyvsp[(2) - (4)].id),NULL);(yyval.Sym)->is.func.isProto=1;resetScope();;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
 #line 108 "src/parser.y"
-    {resetScope(); (yyval.Sym)=pushFunc((yyvsp[(1) - (5)].num),(yyvsp[(2) - (5)].id));(yyval.Sym)->is.func.hasParams = 1;addParam((yyval.Sym),(yyvsp[(4) - (5)].Sym)->is.func.local_table);(yyval.Sym)->is.func.isProto=1;deleteFunc("-pseudo-");resetScope();;}
+    {resetScope(); (yyval.Sym)=pushFunc((yyvsp[(1) - (5)].num),(yyvsp[(2) - (5)].id),(yyvsp[(4) - (5)].Sym)->is.func.local_table); (yyval.Sym)->is.func.isProto=1;resetScope();;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
 #line 112 "src/parser.y"
-    {(yyval.Sym)=pushFunc(0,"-pseudo-");;}
+    {(yyval.Sym)=pushFunc(0,"-pseudo-",NULL);;}
     break;
 
   case 23:
@@ -1681,7 +1674,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1685 "bin/parser.c"
+#line 1678 "bin/parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

@@ -6,6 +6,9 @@
 #include <unistd.h>
 
 #include "main.h"
+#include "symboltable.h"
+
+extern FILE *yyin;
 
 /* Constants */
 static const char *C_EXT = ".c";
@@ -255,20 +258,38 @@ int main (int argc, char *argv[]) {
   /* the resource manager must be initialized before any 
    * further actions are implemented */
 
-  yyparse();
+	rm_init(&resource_mgr);
 
-//  rm_init(&resource_mgr);
-//
-//  if (process_options(argc, argv) == 1) {
-//    rm_cleanup_resources(&resource_mgr);
-//    exit(EXIT_FAILURE);
-//  }
-//
-//  printf("Input: %s\n", cc_options.input_file);
-//  printf("Output: %s\n", cc_options.output_file);
-//  printf("IR: %s\n", cc_options.ir_file);
-//
-//  rm_cleanup_resources(&resource_mgr);
+	if (process_options(argc, argv) == 1) {
+		rm_cleanup_resources(&resource_mgr);
+		exit(EXIT_FAILURE);
+	}
+
+	printf("Input: %s\n", cc_options.input_file);
+	printf("Output: %s\n", cc_options.output_file);
+	printf("IR: %s\n", cc_options.ir_file);
+
+  	// open a file handle to a particular file:
+	FILE *myfile = fopen(cc_options.input_file, "r");
+	// make sure it is valid:
+	if (!myfile) {
+		printf("ERROR! Could not open input file.\n");
+		return -1;
+	}
+	// set flex to read from it instead of defaulting to STDIN:
+	yyin = myfile;
+
+	// parse through the input until there is no more:
+	do {
+		yyparse();
+	} while (!feof(yyin));
+
+	debug_printSymbolTable();
+
+	fclose (myfile);
+
+	rm_cleanup_resources(&resource_mgr);
+	return 0;
 
   return 0;
 }

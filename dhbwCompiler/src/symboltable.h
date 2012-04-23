@@ -34,6 +34,7 @@ typedef struct symbol {
     struct symbol *next;
 } symbol;
 
+
 /**
  * @brief inserts the variable "name" in the global symbol table or the local table of current scope
  * 		  also checks if the symbol already exists
@@ -49,23 +50,10 @@ struct symbol *pushVar(char const *name);
  * @param name of the function
  * @return reference to the created symbol
  */
-struct symbol *pushFunc(int type, char const *name);
+struct symbol * pushFunc(int type, char const *name, struct symbol *paramlist);
 
 /**
- * @brief deletes the function "name" from global symboltable
- * @param name of the function
- */
-void deleteFunc(char const *name);
-
-/**
- * @brief adds a list of parameters to a function
- * @param pointer to the function
- * @param pointer to the parameterlist
- */
-void addParam(struct symbol* function,struct symbol* params);
-
-/**
- * @brief reset scope to global
+ * @brief reset scope to global, unlock global symboltable
  */
 void resetScope();
 
