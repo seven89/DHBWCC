@@ -94,8 +94,8 @@ variable_declaration
      ;
 	
 identifier_declaration
-     : identifier_declaration BRACKET_OPEN NUM BRACKET_CLOSE {$1->is.var.isArray = 1;$1->is.var.arr_size = $3;}
-     | ID {$$ = pushVar($1);}
+     : identifier_declaration BRACKET_OPEN NUM BRACKET_CLOSE {$1->is.var.isArray = 1;$1->is.var.value = $3;}
+     | ID {$$ = pushVar($1,0);}
      ;
 
 function_definition
@@ -159,7 +159,7 @@ stmt_loop
  * assignment operators.expression
  */									
 expression								// 0 = "false", nonzero = "true"
-     : expression ASSIGN expression			
+     : expression ASSIGN expression			{printf("%s ASSIGN %d\n",$1->name, $3->is.var.value);} //this is just some stupid code...
      | expression LOGICAL_OR expression	
      | expression LOGICAL_AND expression
      | LOGICAL_NOT expression		
@@ -169,19 +169,19 @@ expression								// 0 = "false", nonzero = "true"
      | expression LSEQ expression 	
      | expression GTEQ expression 
      | expression GT expression	
-     | expression PLUS expression				
+     | expression PLUS expression			
      | expression MINUS expression				
      | expression MUL expression				
      | MINUS expression %prec UNARY_MINUS		
      | ID BRACKET_OPEN primary BRACKET_CLOSE	
-     | PARA_OPEN expression PARA_CLOSE			
+     | PARA_OPEN expression PARA_CLOSE		{$$=$2;}	
      | function_call							
-     | primary									
+     | primary								{$$=$1;}				
      ;
 
 primary
-     : NUM 										
-     | ID  										
+     : NUM {$$ = (struct symbol*) malloc(sizeof(struct symbol)); $$->is.var.value=$1;}									
+     | ID  {$$ = findSymbol($1);} 										
      ;
 
 function_call
@@ -199,5 +199,4 @@ function_call_parameters
 void yyerror (const char *msg)
 {
 	printf("ERROR: %s\n", msg);
-	//return 0;
 }

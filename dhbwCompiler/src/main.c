@@ -287,6 +287,8 @@ int main(int argc, char *argv[]) {
 		yyparse();
 	} while (!feof(yyin));
 
+	print_all_codes();
+
 	if (cc_options.print_ir)
 		debug_printSymbolTable();
 

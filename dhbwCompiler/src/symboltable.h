@@ -12,7 +12,7 @@
 struct variable{
 	int type;
 	int isArray;
-	int arr_size;
+	int value;
 	int offset;
 	int mem_size;
 	struct symbol *scope;
@@ -43,7 +43,7 @@ typedef struct symbol {
  * @param name of the variable
  * @return reference to the created symbol
  */
-struct symbol *pushVar(char const *name);
+struct symbol *pushVar(char const *name, int value);
 
 /**
  * @brief inserts the variable "name" in the global symbol table

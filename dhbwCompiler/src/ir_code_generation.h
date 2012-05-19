@@ -5,46 +5,87 @@
  *      Author: FS
  */
 
-
 #ifndef _DHBWCC_IR_CODE_GENERATION_H
 #define _DHBWCC_IR_CODE_GENERATION_H
 #include "symboltable.h"
-enum code_ops
+enum code_ops {
+	opASSIGN,
+	opADD,
+	opSUB,
+	opMUL,
+	opMINUS,
+	opSHIFT_LEFT,
+	opSHIFT_RIGHT,
+
+	opLOGICAL_AND,
+	opLOGICAL_OR,
+	opLOGICAL_NOT,
+	opNE,
+	opEQ,
+	opGT,
+	opGTEQ,
+	opLS,
+	opLSEQ,
+
+	opIF,
+	opGOTO,
+	opWHILE_BEGIN,
+	opDO_WHILE_BEGIN,
+
+	opRETURN,
+	opPARAM,
+	opCALL,
+	opMEM_LD,
+	opMEM_ST,
+	opADDR,
+	opFUNC_DEF,
+	opFUNC_DEF_END,
+	opNOP
+
+};
+
+typedef struct code
 {
-opASSIGN, opADD, opSUB, opMUL, opMINUS, opSHIFT_LEFT, opSHIFT_RIGHT,
+	int counter_id;
+	enum code_ops operation;
+	struct symbol *address_0;
+	struct symbol *address_1;
+	struct symbol *address_2;
+	int jmpLabel;
+	int jmpTo;
+	struct code *next;
+}code;
 
-opLOGICAL_AND, opLOGICAL_OR, opLOGICAL_NOT, opNE, opEQ, opGT, opGTEQ, opLS, opLSEQ,
+static char* enumStrings[] = { "ASSIGN", "ADD", "SUB", "MUL", "MINUS",
+		"SHIFT_LEFT", "SHIFT_RIGHT",
 
-opIF, opGOTO, opWHILE_BEGIN, opDO_WHILE_BEGIN,
+		"LOGICAL_AND", "LOGICAL_OR", "LOGICAL_NOT", "NE", "EQ", "GT", "GTEQ",
+		"LS", "LSEQ",
 
-opRETURN, opPARAM, opCALL, opMEM_LD, opMEM_ST, opADDR, opFUNC_DEF, opFUNC_DEF_END, opNOP
+		"IF", "GOTO", "WHILE_BEGIN", "DO_WHILE_BEGIN",
+
+		"RETURN", "PARAM", "CALL", "MEM_LD", "MEM_ST", "ADDR", "FUNC_DEF",
+		"FUNC_DEF_END", "NOP"
 
 };
 
-static char* enumStrings[] = {
-"ASSIGN", "ADD", "SUB", "MUL", "MINUS", "SHIFT_LEFT", "SHIFT_RIGHT",
+void append_code(enum code_ops operation, struct symbol *address_0,
+		struct symbol *address_1, struct symbol *address_2, int jmpTo);
 
-"LOGICAL_AND", "LOGICAL_OR", "LOGICAL_NOT", "NE", "EQ", "GT", "GTEQ", "LS", "LSEQ",
+void print_all_codes();
 
-"IF", "GOTO", "WHILE_BEGIN", "DO_WHILE_BEGIN",
-
-"RETURN", "PARAM", "CALL", "MEM_LD", "MEM_ST", "ADDR", "FUNC_DEF", "FUNC_DEF_END", "NOP"
-
-};
-
-void addCalc (enum code_ops *op, struct symbol *result, struct symbol *exp1, struct symbol *exp2);
-void addWhile (struct symbol *var,enum code_ops *op, struct symbol *condition, struct symbol *step, int label);
-void addWhileDo (struct symbol *var,enum code_ops *op, struct symbol *condition, struct symbol *step, int label);
-void addIf (enum code_ops *op, struct symbol *condition, int label);
+void addCalc(enum code_ops *op, struct symbol *result, struct symbol *exp1,
+		struct symbol *exp2);
+void addWhile(struct symbol *var, enum code_ops *op, struct symbol *condition,
+		struct symbol *step, int label);
+void addWhileDo(struct symbol *var, enum code_ops *op, struct symbol *condition,
+		struct symbol *step, int label);
+void addIf(enum code_ops *op, struct symbol *condition, int label);
 void addIfGoTo();
-void addFunc (enum code_ops *op, struct symbol *type, struct symbol *name, int countParam);
+void addFunc(enum code_ops *op, struct symbol *type, struct symbol *name,
+		int countParam);
 void addReturn();
-void addAssign (struct symbol *res, struct symbol *val, enum code_ops *op);
-
-
+void addAssign(struct symbol *res, struct symbol *val, enum code_ops *op);
 
 #endif
-
-
-
 

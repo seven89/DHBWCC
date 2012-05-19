@@ -38,7 +38,7 @@ symbol *exists_Sym_glob(char const *name, int print_err) {
 	LL_FOREACH(symtable,s) {
 		if (!strcmp(name, s->name)) {
 			if (print_err)
-				printf("ERROR	--	multiple declaration of variable \"%s\n",
+				printf("ERROR	--	multiple declaration of variable \"%s\"\n",
 						name);
 			return (s);
 		}
@@ -103,10 +103,9 @@ int checkparams(struct symbol *s1, struct symbol *s2) {
 		return (0);
 
 	while (s1 != NULL && s2 != NULL) {
-		if (s1->is.var.type != s2->is.var.type || strcmp(s1->name, s2->name)
-				|| s1->is.var.isArray != s2->is.var.isArray)
+		if (s1->is.var.type != s2->is.var.type || strcmp(s1->name, s2->name) )
 			check = 0;
-		else if (s1->is.var.arr_size != s2->is.var.arr_size)
+		else if(s1->is.var.isArray != s2->is.var.isArray && s1->is.var.value != s2->is.var.value)
 			check = 0;
 
 		s1 = s1->next;
@@ -166,7 +165,7 @@ void deleteFunc(char const *name) {
  * @param name of the variable
  * @return reference to the created symbol
  */
-struct symbol *pushVar(char const *name) {
+struct symbol *pushVar(char const *name, int value) {
 	if (!symtablelock) {
 		struct symbol *s = NULL;
 		s = (struct symbol*) malloc(sizeof(struct symbol));
@@ -175,7 +174,7 @@ struct symbol *pushVar(char const *name) {
 		s->isFunc = 0; //s is not a function
 		s->is.var.type = 1; //s is of type int
 		s->is.var.isArray = 0; //s is initialized as normal variable
-		s->is.var.arr_size = 0; //therefore we have no size
+		s->is.var.value = value; //therefore we have no size
 
 		if (currentScope == NULL) {
 			if (exists_Sym_glob(name, 1) == NULL) {
@@ -238,7 +237,7 @@ struct symbol * pushFunc(int type, char const *name, struct symbol *paramlist) {
 		deleteFunc("-pseudo-");
 	}
 
-	ref = exists_Sym_glob(name, 1);
+	ref = exists_Sym_glob(name, 0);
 
 	if (ref == NULL) {
 
@@ -351,7 +350,7 @@ void debug_printSymbolTable() {
 			LL_FOREACH(s->is.func.local_table,el) {
 				if (el->is.var.isArray)
 					printf("\t\t\t|int name:%s[%d] |\n", el->name, // local array
-							el->is.var.arr_size);
+							el->is.var.value);
 				else
 					printf("\t\t\t|int name:%s| \n", el->name); //local var
 			}
@@ -360,7 +359,7 @@ void debug_printSymbolTable() {
 				LL_FOREACH(s->is.func.param_list,el) {
 					if (el->is.var.isArray)
 						printf("\t\t\t\t\t\t|int name:%s[%d] |\n", el->name, // local array
-								el->is.var.arr_size);
+								el->is.var.value);
 					else
 						printf("\t\t\t\t\t\t|int name:%s| \n", el->name); //local var
 				}
@@ -370,7 +369,7 @@ void debug_printSymbolTable() {
 		//is global variable
 		else {
 			if (s->is.var.isArray)
-				printf("|int name:%s[%d] |\n", s->name, s->is.var.arr_size);
+				printf("|int name:%s[%d] |\n", s->name, s->is.var.value);
 			else
 				printf("|int name:%s| \n", s->name); //global var
 
