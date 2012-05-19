@@ -1,0 +1,2 @@
+find . -type f -name "*.c" -printf "echo \"\n\n\n\n testing file \"%p\" ....\n\"\n ../bin/./dhbwcc $1 %p \n" | bash
+
