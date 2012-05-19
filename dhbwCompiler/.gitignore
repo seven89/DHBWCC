@@ -4,13 +4,13 @@
 .project
 .settings/
 
-dhbwCompiler/src/bin32
-dhbwCompiler/src/parser.tab.c
-dhbwCompiler/src/parser.tab.h
+src/bin32
+src/parser.tab.c
+src/parser.tab.h
 
 #Ignore build files and folder
 bin/
-dhbwCompiler/bin/*
+bin/*
 dhbwCompiler/Debug/
 dhbwCompiler/Release/
 dhbwCompiler/doxygen/
