@@ -1,2 +1,0 @@
-int global;
-int global;

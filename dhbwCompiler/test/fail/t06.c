@@ -1,3 +1,0 @@
-int func;
-
-void func () {}
