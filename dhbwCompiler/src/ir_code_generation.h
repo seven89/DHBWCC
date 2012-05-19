@@ -5,9 +5,10 @@
  *      Author: FS
  */
 
+
 #ifndef _DHBWCC_IR_CODE_GENERATION_H
 #define _DHBWCC_IR_CODE_GENERATION_H
-
+#include "symboltable.h"
 enum code_ops
 {
 opASSIGN, opADD, opSUB, opMUL, opMINUS, opSHIFT_LEFT, opSHIFT_RIGHT,
@@ -30,8 +31,19 @@ static char* enumStrings[] = {
 "RETURN", "PARAM", "CALL", "MEM_LD", "MEM_ST", "ADDR", "FUNC_DEF", "FUNC_DEF_END", "NOP"
 
 };
-#endif
 
+void addCalc (enum code_ops *op, struct symbol *result, struct symbol *exp1, struct symbol *exp2);
+void addWhile (struct symbol *var,enum code_ops *op, struct symbol *condition, struct symbol *step, int label);
+void addWhileDo (struct symbol *var,enum code_ops *op, struct symbol *condition, struct symbol *step, int label);
+void addIf (enum code_ops *op, struct symbol *condition, int label);
+void addIfGoTo();
+void addFunc (enum code_ops *op, struct symbol *type, struct symbol *name, int countParam);
+void addReturn();
+void addAssign (struct symbol *res, struct symbol *val, enum code_ops *op);
+
+
+
+#endif
 
 
 
