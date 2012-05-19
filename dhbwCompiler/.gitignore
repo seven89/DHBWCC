@@ -1,15 +1,15 @@
 #Ignore Eclipse related files and folders
-dhbwCompiler/.classpath
-dhbwCompiler/.cproject
-dhbwCompiler/.project
-dhbwCompiler/.settings/
+.classpath
+.cproject
+.project
+.settings/
 
 dhbwCompiler/src/bin32
 dhbwCompiler/src/parser.tab.c
 dhbwCompiler/src/parser.tab.h
 
 #Ignore build files and folder
-dhbwCompiler/bin/
+bin/
 dhbwCompiler/bin/*
 dhbwCompiler/Debug/
 dhbwCompiler/Release/
