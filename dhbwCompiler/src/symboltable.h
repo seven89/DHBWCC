@@ -12,7 +12,9 @@
 struct variable{
 	int type;
 	int isArray;
-	int size;
+	int arr_size;
+	int offset;
+	int mem_size;
 	struct symbol *scope;
 };
 
@@ -51,6 +53,13 @@ struct symbol *pushVar(char const *name);
  * @return reference to the created symbol
  */
 struct symbol * pushFunc(int type, char const *name, struct symbol *paramlist);
+
+/**
+ * @brief finds a symbol in any table by name - order: param_list, local_list, global_list
+ * @param name of the symbol
+ * @return pointer to the searched symbol or NULL if it does not exist
+ */
+struct symbol * findSymbol(const char *name);
 
 /**
  * @brief reset scope to global, unlock global symboltable

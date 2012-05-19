@@ -72,7 +72,7 @@ program
      ;
 
 program_element_list
-     : program_element_list program_element //{ debug_printSymbolTable();} 	
+     : program_element_list program_element 
      | program_element 				
      ;
 
@@ -94,7 +94,7 @@ variable_declaration
      ;
 	
 identifier_declaration
-     : identifier_declaration BRACKET_OPEN NUM BRACKET_CLOSE {$1->is.var.isArray = 1;$1->is.var.size = $3;}
+     : identifier_declaration BRACKET_OPEN NUM BRACKET_CLOSE {$1->is.var.isArray = 1;$1->is.var.arr_size = $3;}
      | ID {$$ = pushVar($1);}
      ;
 
@@ -140,8 +140,8 @@ stmt_block
 //changed the grammar slightly to handle the goto statements easier.
 
 stmt_conditional
-     : IF PARA_OPEN expression PARA_CLOSE stmt_conditional_r //stmt
-     //| IF PARA_OPEN expression {addif($3);addifgoto();} PARA_CLOSE stmt ELSE stmt	//{addif($3);addifgoto();}
+     : IF PARA_OPEN expression PARA_CLOSE stmt_conditional_r 
+     //| IF PARA_OPEN expression 
      ;
      
 stmt_conditional_r
@@ -180,8 +180,8 @@ expression								// 0 = "false", nonzero = "true"
      ;
 
 primary
-     : NUM 										{printf("-num-");}
-     | ID  										{printf("-id-");}
+     : NUM 										
+     | ID  										
      ;
 
 function_call

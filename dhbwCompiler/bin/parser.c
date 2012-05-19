@@ -1584,7 +1584,7 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 97 "src/parser.y"
-    {(yyvsp[(1) - (4)].Sym)->is.var.isArray = 1;(yyvsp[(1) - (4)].Sym)->is.var.size = (yyvsp[(3) - (4)].num);;}
+    {(yyvsp[(1) - (4)].Sym)->is.var.isArray = 1;(yyvsp[(1) - (4)].Sym)->is.var.arr_size = (yyvsp[(3) - (4)].num);;}
     break;
 
   case 14:
@@ -1657,24 +1657,10 @@ yyreduce:
     {(yyval.Sym)=(yyvsp[(2) - (2)].Sym);;}
     break;
 
-  case 59:
-
-/* Line 1455 of yacc.c  */
-#line 183 "src/parser.y"
-    {printf("-num-");;}
-    break;
-
-  case 60:
-
-/* Line 1455 of yacc.c  */
-#line 184 "src/parser.y"
-    {printf("-id-");;}
-    break;
-
 
 
 /* Line 1455 of yacc.c  */
-#line 1678 "bin/parser.c"
+#line 1664 "bin/parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

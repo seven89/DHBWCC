@@ -1,0 +1,21 @@
+#Ignore Eclipse related files and folders
+.classpath
+.cproject
+.project
+.settings/
+
+#Ignore build files and folder
+bin/
+Debug/
+Release/
+doxygen/
+
+#Ignore javadocs and architecture overhead
+.ucls
+.jpg
+.dia
+doc/
+
+#also ignores special files
+*.swp
+

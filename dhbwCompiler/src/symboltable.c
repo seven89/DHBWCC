@@ -5,6 +5,7 @@
  *      Author: NA
  */
 
+#include "main.h"
 #include "symboltable.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +23,7 @@ int DEBUG = 0; // set 1 for printf-output
  * @param name of the global symbol
  * @return reference to the global symbol or NULL if does not exist
  */
-symbol *exists_Sym_glob(char const *name) {
+symbol *exists_Sym_glob(char const *name, int print_err) {
 	symbol *s = NULL;
 
 	if (DEBUG)
@@ -36,6 +37,9 @@ symbol *exists_Sym_glob(char const *name) {
 
 	LL_FOREACH(symtable,s) {
 		if (!strcmp(name, s->name)) {
+			if (print_err)
+				printf("ERROR	--	multiple declaration of variable \"%s\n",
+						name);
 			return (s);
 		}
 	}
@@ -51,7 +55,7 @@ symbol *exists_Sym_glob(char const *name) {
  * @param name of the local symbol
  * @return reference to the local symbol or NULL if does not exist
  */
-symbol * exists_Sym_loc(char const *name) {
+symbol * exists_Sym_loc(char const *name, int print_err) {
 	symbol *s = NULL;
 	if (DEBUG)
 		printf("searching for symbol \"%s\" in table \"%s\"\n", name,
@@ -64,7 +68,9 @@ symbol * exists_Sym_loc(char const *name) {
 
 	LL_FOREACH(currentScope->is.func.local_table,s) {
 		if (!strcmp(name, s->name)) {
-			printf("ERROR	--	multiple declaration of variable \"%s\n", name);
+			if (print_err)
+				printf("ERROR	--	multiple declaration of variable \"%s\n",
+						name);
 			return (s);
 		}
 	}
@@ -100,7 +106,7 @@ int checkparams(struct symbol *s1, struct symbol *s2) {
 		if (s1->is.var.type != s2->is.var.type || strcmp(s1->name, s2->name)
 				|| s1->is.var.isArray != s2->is.var.isArray)
 			check = 0;
-		else if (s1->is.var.size != s2->is.var.size)
+		else if (s1->is.var.arr_size != s2->is.var.arr_size)
 			check = 0;
 
 		s1 = s1->next;
@@ -115,7 +121,7 @@ int checkparams(struct symbol *s1, struct symbol *s2) {
  * @param name of the local symbol
  * @return reference to the parameter symbol or NULL if does not exist
  */
-symbol * exists_Param(char const *name) {
+symbol * exists_Param(char const *name, int print_err) {
 	symbol *s = NULL;
 	if (DEBUG)
 		printf("searching for param \"%s\" in table \"%s\"\n", name,
@@ -128,7 +134,8 @@ symbol * exists_Param(char const *name) {
 
 	LL_FOREACH(currentScope->is.func.param_list,s) {
 		if (!strcmp(name, s->name)) {
-			printf("ERROR	--	there is already a parameter \"%s\"\n", name);
+			if (print_err)
+				printf("ERROR	--	there is already a parameter \"%s\"\n", name);
 			return (s);
 		}
 	}
@@ -144,7 +151,7 @@ symbol * exists_Param(char const *name) {
  */
 void deleteFunc(char const *name) {
 	struct symbol *ref = NULL;
-	ref = exists_Sym_glob(name);
+	ref = exists_Sym_glob(name, 0);
 
 	if (ref != NULL) {
 		if (DEBUG)
@@ -168,20 +175,18 @@ struct symbol *pushVar(char const *name) {
 		s->isFunc = 0; //s is not a function
 		s->is.var.type = 1; //s is of type int
 		s->is.var.isArray = 0; //s is initialized as normal variable
-		s->is.var.size = 0; //therefore we have no size
+		s->is.var.arr_size = 0; //therefore we have no size
 
 		if (currentScope == NULL) {
-			if (exists_Sym_glob(name) == NULL) {
+			if (exists_Sym_glob(name, 1) == NULL) {
 				s->is.var.scope = NULL;
 				if (DEBUG)
 					printf("appending global variable %s\n", name);
 				LL_APPEND(symtable, s);
 				return (s);
-			} else
-				printf("ERROR	--	multiple declaration of variable \"%s\n",
-						name);
-		} else if (exists_Param(name) == NULL) {
-			if (exists_Sym_loc(name) == NULL) {
+			}
+		} else if (exists_Param(name, 1) == NULL) {
+			if (exists_Sym_loc(name, 1) == NULL) {
 				s->is.var.scope = currentScope;
 				if (DEBUG)
 					printf(
@@ -194,6 +199,18 @@ struct symbol *pushVar(char const *name) {
 	}
 
 	return NULL;
+}
+
+/**
+ * @brief adds a list of parameters to a function
+ * @param pointer to the function
+ * @param pointer to the parameterlist
+ */
+void addParam(struct symbol* function, struct symbol* params) {
+	if (DEBUG)
+		printf("added parameter list to function \"%s\"", function->name);
+	if (function->is.func.param_list == NULL)
+		LL_CONCAT(function->is.func.param_list, params);
 }
 
 /**
@@ -221,7 +238,7 @@ struct symbol * pushFunc(int type, char const *name, struct symbol *paramlist) {
 		deleteFunc("-pseudo-");
 	}
 
-	ref = exists_Sym_glob(name);
+	ref = exists_Sym_glob(name, 1);
 
 	if (ref == NULL) {
 
@@ -285,15 +302,24 @@ void resetScope() {
 }
 
 /**
- * @brief adds a list of parameters to a function
- * @param pointer to the function
- * @param pointer to the parameterlist
+ * @brief finds a symbol in any table by name - order: param_list, local_list, global_list
+ * @param name of the symbol
+ * @return pointer to the searched symbol or NULL if it does not exist
  */
-void addParam(struct symbol* function, struct symbol* params) {
-	if (DEBUG)
-		printf("added parameter list to function \"%s\"", function->name);
-	if (function->is.func.param_list == NULL)
-		LL_CONCAT(function->is.func.param_list, params);
+struct symbol * findSymbol(const char *name) {
+	symbol *s = NULL;
+	int suppress_error = 0;
+	if (currentScope == NULL)
+		return (exists_Sym_glob(name, suppress_error));
+	else {
+		if (s == NULL)
+			s = exists_Param(name, suppress_error);
+		if (s == NULL)
+			s = exists_Sym_loc(name, suppress_error);
+		if (s == NULL)
+			s = exists_Sym_glob(name, suppress_error);
+	}
+	return (s);
 }
 
 /**
@@ -325,7 +351,7 @@ void debug_printSymbolTable() {
 			LL_FOREACH(s->is.func.local_table,el) {
 				if (el->is.var.isArray)
 					printf("\t\t\t|int name:%s[%d] |\n", el->name, // local array
-							el->is.var.size);
+							el->is.var.arr_size);
 				else
 					printf("\t\t\t|int name:%s| \n", el->name); //local var
 			}
@@ -334,7 +360,7 @@ void debug_printSymbolTable() {
 				LL_FOREACH(s->is.func.param_list,el) {
 					if (el->is.var.isArray)
 						printf("\t\t\t\t\t\t|int name:%s[%d] |\n", el->name, // local array
-								el->is.var.size);
+								el->is.var.arr_size);
 					else
 						printf("\t\t\t\t\t\t|int name:%s| \n", el->name); //local var
 				}
@@ -344,7 +370,7 @@ void debug_printSymbolTable() {
 		//is global variable
 		else {
 			if (s->is.var.isArray)
-				printf("|int name:%s[%d] |\n", s->name, s->is.var.size);
+				printf("|int name:%s[%d] |\n", s->name, s->is.var.arr_size);
 			else
 				printf("|int name:%s| \n", s->name); //global var
 
