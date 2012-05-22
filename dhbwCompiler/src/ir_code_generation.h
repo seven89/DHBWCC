@@ -68,6 +68,21 @@ typedef struct ir_code{
 		enum code_ops operation;
 	}ifExp;
 
+	union TRUELIST
+	{
+		int counter_id;
+		struct symbol *marker;
+		union TRUELIST *next;
+	}TRUELIST;
+
+	union FALSELIST
+	{
+		int counter_id;
+		struct symbol *marker;
+		struct symbol *exp;
+		union FALSELIST *next;
+	}FALSELIST;
+
 	struct ir_code *next;
 }ir_code;
 
@@ -92,7 +107,7 @@ void addWhile(struct symbol *var, enum code_ops *op, struct symbol *condition,
 		struct symbol *step, int label);
 void addWhileDo(struct symbol *var, enum code_ops *op, struct symbol *condition,
 		struct symbol *step, int label);
-void addIf(enum code_ops *op, struct symbol *condition, int label);
+void addIf(enum code_ops *op, struct symbol *expressions, struct symbol *marker);
 void addIfGoTo();
 void addFunc(enum code_ops *op, struct symbol *type, struct symbol *name,
 		int countParam);

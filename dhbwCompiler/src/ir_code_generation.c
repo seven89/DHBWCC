@@ -14,7 +14,10 @@
 
 int num_of_codes;
 
+//Initialize
 ir_code *code_list = NULL;
+TRUELIST  *truelist = NULL;
+FALSELIST *falselist = NULL;
 
 void genQuad(enum code_ops operation, struct symbol *address_0,
 		struct symbol *address_1, struct symbol *address_2, int jmpTo) {
@@ -47,8 +50,71 @@ void addWhile(struct symbol *var, enum code_ops *op, struct symbol *condition,
 		struct symbol *step, int label);
 void addWhileDo(struct symbol *var, enum code_ops *op, struct symbol *condition,
 		struct symbol *step, int label);
-void addIf(enum code_ops *op, struct symbol *condition, int label)
+void addIf(enum code_ops *op, struct symbol *expressions, struct symbol *marker)
 {
+	int exp = 0;
+	/**expressions is an array of expressions
+	 * marker is the jump address, maybe an array of length two*/
+	if(sizeof(expressions) <= 1)
+	{
+		/** simple if-statement with only one expression**/
+		genQuad(op, exp, NULL, NULL, marker);
+	}
+	else
+	{
+		/** more complex if-statement with more than one expression**/
+		//get each exp of expressions array
+		while(1)
+		{
+			if(exp == sizeof(expressions)-1)
+			{
+				//TODO: decision whether true-/falselist
+				genQuad(op, NULL, NULL, NULL, get_marker(*truelist,true));
+			}
+			else
+			{
+				backpatch(expressions[exp], marker);
+			}
+		}
+	}
+}
+
+symbol get_marker(ir_code *list, boolean checkList)
+{
+	/**get_marker returns the last input marker of a true-/false list**/
+	ir_code *torf = NULL;
+	LL_FOREACH(list,torf);{
+		if(checkList == true)
+		{
+			if(torf->TRUELIST.counter_id == sizeof(list)-1)
+			{
+				return torf;
+			}
+		}
+		else
+		{
+			if(torf->FALSELIST.counter_id == sizeof(list)-1)
+			{
+				return torf;
+			}
+		}
+	}
+}
+
+void backpatch (struct symbol *exp, struct symbol *marker)
+{
+	//TODO decision for true-/falselist
+	//Initialize
+	ir_code *list = NULL;
+	list = (struct ir_code*) malloc(sizeof(struct ir_code));
+	/**save to TrueList**/
+	list->TRUELIST.marker = marker;
+	list->TRUELIST.exp = exp;
+	LL_APPEND(truelist,list);
+	/**save to FalseList**/
+	list->FALSELIST.marker = marker;
+	list->FALSELIST.exp = exp;
+	LL_APPEND(falselist,list);
 
 }
 void addIfGoTo();
