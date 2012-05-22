@@ -14,30 +14,49 @@
 
 int num_of_codes;
 
-code *code_list = NULL;
+ir_code *code_list = NULL;
 
-void append_code(enum code_ops operation, struct symbol *address_0,
+void genQuad(enum code_ops operation, struct symbol *address_0,
 		struct symbol *address_1, struct symbol *address_2, int jmpTo) {
-	code *c = NULL;
-	c = (struct code*) malloc(sizeof(struct code));
-	c->counter_id = num_of_codes;
-	c->operation = operation;
-	c->address_0 = address_0;
-	c->address_1 = address_1;
-	c->address_2 = address_2;
-	c->jmpTo = jmpTo;
+	/**Quadrupel Code Generation**/
+	ir_code *c = NULL;
+	c = (struct ir_code*) malloc(sizeof(struct ir_code));
+	c->code.counter_id = num_of_codes;
+	c->code.operation = operation;
+	c->code.address_0 = address_0;
+	c->code.address_1 = address_1;
+	c->code.address_2 = address_2;
+	c->code.jmpTo = jmpTo;
 	LL_APPEND(code_list,c);
 	num_of_codes++;
 }
 
 void print_all_codes(){
-	code *c = NULL;
-	LL_FOREACH(code_list,c){
-		printf("code no. %d\n",c->counter_id);
+	ir_code *c = NULL;
+	LL_FOREACH(code_list,c);{
+		printf("code no. %d\n",c->code.counter_id);
 	}
 }
 
-//
+void addCalc(enum code_ops *op, struct symbol *result, struct symbol *exp1,
+		struct symbol *exp2)
+{
+	genQuad(op, result, exp1, exp2,NULL);
+}
+void addWhile(struct symbol *var, enum code_ops *op, struct symbol *condition,
+		struct symbol *step, int label);
+void addWhileDo(struct symbol *var, enum code_ops *op, struct symbol *condition,
+		struct symbol *step, int label);
+void addIf(enum code_ops *op, struct symbol *condition, int label)
+{
+
+}
+void addIfGoTo();
+void addFunc(enum code_ops *op, struct symbol *type, struct symbol *name,
+		int countParam);
+void addReturn();
+void addAssign(struct symbol *res, struct symbol *val, enum code_ops *op);
+
 ////temporary array; dimension is given by count
 //symbol irtemp(int count) {
 //	int size = count;

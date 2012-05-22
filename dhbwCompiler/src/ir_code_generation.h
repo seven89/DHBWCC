@@ -44,17 +44,32 @@ enum code_ops {
 
 };
 
-typedef struct code
-{
-	int counter_id;
-	enum code_ops operation;
-	struct symbol *address_0;
-	struct symbol *address_1;
-	struct symbol *address_2;
-	int jmpLabel;
-	int jmpTo;
-	struct code *next;
-}code;
+typedef struct ir_code{
+	/**ir_code pre-definitions**/
+	union code
+	{
+		int counter_id;
+		enum code_ops operation;
+		struct symbol *address_0;
+		struct symbol *address_1;
+		struct symbol *address_2;
+		int jmpLabel;
+		int jmpTo;
+		union code *next;
+	}code;
+
+	union funcCall
+	{
+		int counter_params;
+	}funcCall;
+
+	union ifExp
+	{
+		enum code_ops operation;
+	}ifExp;
+
+	struct ir_code *next;
+}ir_code;
 
 static char* enumStrings[] = { "ASSIGN", "ADD", "SUB", "MUL", "MINUS",
 		"SHIFT_LEFT", "SHIFT_RIGHT",
@@ -68,9 +83,6 @@ static char* enumStrings[] = { "ASSIGN", "ADD", "SUB", "MUL", "MINUS",
 		"FUNC_DEF_END", "NOP"
 
 };
-
-void append_code(enum code_ops operation, struct symbol *address_0,
-		struct symbol *address_1, struct symbol *address_2, int jmpTo);
 
 void print_all_codes();
 
